@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Experto - Vacaciones Perfectas</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #f4f7fc, #cfe9f5);
+        }
+
+        header {
+            background: #007bff;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            animation: fadeIn 2s;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: slideUp 1s;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #recommendations {
+            margin-top: 20px;
+            animation: fadeIn 1.5s;
+        }
+
+        .recommendation {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            animation: slideUp 1s;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .recommendation:hover {
+            transform: scale(1.05);
+        }
+
+        .recommendation h3 {
+            color: #007bff;
+            font-size: 1.8rem;
+        }
+
+        .recommendation p {
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .recommendation .highlight {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .recommendation img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        footer {
+            background: #007bff;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Encuentra tu Destino Ideal</h1>
+        <p>Planea unas vacaciones inolvidables</p>
+    </header>
+
+    <main>
+        <form id="preferences-form">
+            <label for="destination">Destino</label>
+            <select id="destination" required>
+                <option value="">Selecciona un destino</option>
+                <option value="Playa">Playa</option>
+                <option value="Montaña">Montaña</option>
+                <option value="Ciudad">Ciudad</option>
+                <option value="Desierto">Desierto</option>
+                <option value="Selva">Selva</option>
+            </select>
+
+            <label for="accommodation">Alojamiento</label>
+            <select id="accommodation" required>
+                <option value="">Selecciona el alojamiento</option>
+                <option value="Hotel">Hotel</option>
+                <option value="Cabaña">Cabaña</option>
+                <option value="Hostal">Hostal</option>
+                <option value="Camping">Camping</option>
+                <option value="Resort">Resort</option>
+            </select>
+
+            <label for="activities">Actividades</label>
+            <select id="activities" required>
+                <option value="">Selecciona las actividades</option>
+                <option value="Senderismo">Senderismo</option>
+                <option value="Buceo">Buceo</option>
+                <option value="Visitas Culturales">Visitas Culturales</option>
+                <option value="Safari">Safari</option>
+                <option value="Esquí">Esquí</option>
+            </select>
+
+            <label for="budget">Presupuesto</label>
+            <select id="budget" required>
+                <option value="">Selecciona el presupuesto</option>
+                <option value="Bajo">Bajo</option>
+                <option value="Medio">Medio</option>
+                <option value="Alto">Alto</option>
+                <option value="Lujo">Lujo</option>
+            </select>
+
+            <button type="submit">Buscar Recomendaciones</button>
+        </form>
+
+        <div id="recommendations"></div>
+    </main>
+
+    <footer>
+        <p>© 2024 Vacaciones Perfectas. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        document.getElementById('preferences-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const destination = document.getElementById('destination').value;
+            const accommodation = document.getElementById('accommodation').value;
+            const activities = document.getElementById('activities').value;
+            const budget = document.getElementById('budget').value;
+
+            if (!destination || !accommodation || !activities || !budget) {
+                alert('Por favor, completa todos los campos.');
+                return;
+            }
+
+            fetch(`http://localhost:3005/recommendations?destination=${destination}&accommodation=${accommodation}&activities=${activities}&budget=${budget}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la solicitud a la API');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const recommendationsDiv = document.getElementById('recommendations');
+                    recommendationsDiv.innerHTML = '';
+
+                    if (data.length === 0) {
+                        recommendationsDiv.innerHTML = '<p>No se encontraron recomendaciones.</p>';
+                    } else {
+                        data.forEach(recommendation => {
+                            const div = document.createElement('div');
+                            div.classList.add('recommendation');
+                            div.innerHTML = `
+                                <h3>${recommendation.name}</h3>
+                                <img src="${recommendation.imageURL}" alt="${recommendation.name}">
+                                <p><span class="highlight">Descripción:</span> ${recommendation.description}</p>
+                                <p><span class="highlight">Destino:</span> ${recommendation.destination}</p>
+                                <p><span class="highlight">Alojamiento:</span> ${recommendation.accommodation}</p>
+                                <p><span class="highlight">Actividades:</span> ${recommendation.activities}</p>
+                                <p><span class="highlight">Presupuesto:</span> ${recommendation.budget}</p>
+                                <p><span class="highlight">¿Por qué este destino?</span> Este destino es perfecto porque combina tus preferencias en actividades, tipo de alojamiento y presupuesto, brindándote una experiencia única y memorable.</p>
+                            `;
+                            recommendationsDiv.appendChild(div);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al obtener datos:', error);
+                    alert('Hubo un error al obtener las recomendaciones.');
+                });
+        });
+    </script>
+</body>
+</html>
